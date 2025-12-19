@@ -1,0 +1,28 @@
+{{ define "base" }}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    {{ block "title_block" . }}
+    <title>{{ template "title" . }}</title>
+    {{ end }}
+</head>
+
+<body class="bg-white text-gray-900">
+    <main class="container mx-auto px-4 py-6">
+        {{ block "content_block" . }}
+        {{ template "content" . }}
+        {{ end }}
+    </main>
+
+    {{ block "js_block" . }}
+    {{ template "js" . }}
+    {{ end }}
+</body>
+
+</html>
+{{ end }}

@@ -1,0 +1,90 @@
+{{template "base" .}}
+
+{{ define "title" }}Virtual Terminal{{ end }}
+
+{{ define "content" }}
+<div class="max-w-lg mx-auto mt-10 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+    <h2 class="text-3xl text-center font-semibold text-gray-800 mb-6">Virtual Terminal</h2>
+    <form id="charge_form" class="space-y-4">
+
+        <!-- Amount -->
+        <div>
+            <label for="amount" class="block text-gray-700 font-medium mb-1">Amount</label>
+            <input type="number" id="amount" placeholder="100.00" required
+                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400" />
+        </div>
+
+        <!-- Cardholder Name -->
+        <div>
+            <label for="cardholder_name" class="block text-gray-700 font-medium mb-1">Cardholder Name</label>
+            <input type="text" id="cardholder_name" placeholder="John Doe" required
+                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400" />
+        </div>
+
+        <!-- Cardholder Email -->
+        <div>
+            <label for="cardholder_email" class="block text-gray-700 font-medium mb-1">Email</label>
+            <input type="email" id="cardholder_email" placeholder="example@gmail.com" required
+                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-rose-400" />
+        </div>
+
+        <!-- Stripe Card Element -->
+        <div>
+            <label class="block text-gray-700 font-medium mb-1">Credit Card</label>
+            <div id="card-element" class="w-full border border-gray-300 rounded-lg px-4 py-2"></div>
+            <div id="card-errors" class="text-red-500 mt-2 text-sm"></div>
+        </div>
+
+        <!-- Submit -->
+        <button id="submit-button" type="submit"
+            class=" w-full bg-rose-500 text-white font-semibold py-2 rounded-lg hover:bg-rose-600 transition-colors">
+            Pay Now
+        </button>
+    </form>
+</div>
+{{ end }}
+
+{{ define "js" }}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    console.log("Virtual terminal loaded");
+
+    // Replace with your Stripe publishable key
+    const stripe = Stripe("pk_test_XXXXXXXXXXXXXXXXXX");
+
+    const elements = stripe.elements();
+    const style = {
+        base: {
+            fontSize: '16px',
+            color: '#32325d',
+            '::placeholder': { color: '#a0aec0' },
+            fontFamily: 'inherit'
+        },
+        invalid: {
+            color: '#e53e3e',
+        }
+    };
+
+    const card = elements.create('card', { style });
+    card.mount('#card-element');
+
+    card.on('change', ({ error }) => {
+        const displayError = document.getElementById('card-errors');
+        displayError.textContent = error ? error.message : '';
+    });
+
+    const form = document.getElementById('charge_form');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const { token, error } = await stripe.createToken(card);
+
+        if (error) {
+            document.getElementById('card-errors').textContent = error.message;
+        } else {
+            // Here you would submit the token and other form data to your backend
+            console.log('Token ID:', token.id);
+            alert('Payment token created! Check console.');
+        }
+    });
+</script>
+{{ end }}
